@@ -1,5 +1,9 @@
 'use client';
 
+import { celebrateEscrow } from '@/lib/confetti';
+import { useEscapeKey } from '@/hooks/useEscapeKey';
+import { DeliverableChecksums } from '@/components/FileChecksumBadge';
+
 import React, { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
@@ -226,6 +230,7 @@ export default function ProjectDetailsPage() {
         },
       });
 
+      celebrateEscrow();
       const onChainId = res.onChainProjectId ? Number(res.onChainProjectId) : 1;
       setTxState((prev) => ({ ...prev, stage: 'success', txHash: res.txHash, message: `Escrow project #${onChainId} created on Stellar!` }));
 
@@ -377,6 +382,15 @@ export default function ProjectDetailsPage() {
     }
   };
 
+  const celebrateFinalRelease = (released: Milestone) => {
+    const milestones = project?.milestones ?? [];
+    if (milestones.some((milestone) => milestone.id === released.id) && milestones.every((milestone) =>
+      milestone.id === released.id || milestone.status === 'approved'
+    )) {
+      celebrateEscrow();
+    }
+  };
+
   // 3. Client Action: Approve Milestone & Release on-chain funds
   const handleApproveMilestone = async () => {
     if (!activeApproveModal) return;
@@ -402,6 +416,7 @@ export default function ProjectDetailsPage() {
           setTxState((prev) => ({ ...prev, stage, message }));
         },
       });
+      celebrateFinalRelease(activeApproveModal);
 
       setTxState((prev) => ({
         ...prev,
@@ -455,6 +470,7 @@ export default function ProjectDetailsPage() {
           setTxState((prev) => ({ ...prev, stage, message }));
         },
       });
+      celebrateFinalRelease(milestone);
 
       setTxState((prev) => ({
         ...prev,
