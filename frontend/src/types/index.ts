@@ -63,6 +63,7 @@ export interface Applicant {
   status?: 'pending' | 'accepted' | 'denied' | 'granted' | 'rejected';
   granted?: boolean;
   created_at?: string;
+  zk_attestation?: unknown;
 }
 
 export interface Proposal {
@@ -96,4 +97,52 @@ export interface PaginationMeta {
   totalPages: number;
   hasNextPage: boolean;
   hasPrevPage: boolean;
+}
+
+export type TransactionOperationType = 'Deposit' | 'Release' | 'Dispute' | 'Fee' | 'Refund' | 'Other';
+
+export interface TransactionActivity {
+  id: string;
+  hash: string;
+  ledger: number;
+  timestamp: string;
+  operation_type: TransactionOperationType;
+  amount: number;
+  asset: string;
+  counterparty: string;
+  status: 'success' | 'failed' | 'pending';
+}
+
+export interface ContractTtlInfo {
+  contract_id: string;
+  current_ledger: number;
+  expiration_ledger: number;
+  remaining_ledgers: number;
+  is_warning: boolean;
+  last_bumped_at?: string;
+}
+
+export interface ProjectReview {
+  id: string;
+  project_id: string;
+  reviewer_address: string;
+  reviewer_role: 'client' | 'freelancer';
+  communication_rating: number;
+  quality_rating: number;
+  timeliness_rating: number;
+  average_rating: number;
+  testimonial: string;
+  created_at: string;
+}
+
+/** A freelancer the client has starred, with private notes (#255). */
+export interface StarredFreelancer {
+  /** Stellar address, the stable identifier. */
+  address: string;
+  name?: string;
+  /** Private to the client; never sent to the freelancer. */
+  notes: string;
+  starredAt: string;
+  /** Project the freelancer applied to or worked on, for context. */
+  lastProjectTitle?: string;
 }

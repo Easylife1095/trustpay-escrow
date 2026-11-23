@@ -125,6 +125,8 @@ export function ProjectChatModal({
     }
   }, [messages, isOpen]);
 
+  useEscapeKey(onClose, isOpen);
+
   const handleSendMessage = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
 

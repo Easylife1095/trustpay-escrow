@@ -73,6 +73,28 @@ export default function ProjectDetailsPage() {
   const [showFundEscrowModal, setShowFundEscrowModal] = useState(false);
   const [fundFreelancerAddress, setFundFreelancerAddress] = useState('');
 
+  // Escape mirrors each modal's own Cancel button.
+  useEscapeKey(() => {
+    setActiveDeliverableModal(null);
+    setDeliverableHash('');
+    setDeliverableUrl('');
+    setDeliverableNotes('');
+  }, Boolean(activeDeliverableModal));
+  useEscapeKey(() => {
+    setActiveRevisionModal(null);
+    setRevisionNote('');
+  }, Boolean(activeRevisionModal));
+  useEscapeKey(() => setActiveApproveModal(null), Boolean(activeApproveModal));
+  useEscapeKey(() => setShowFundEscrowModal(false), showFundEscrowModal);
+  useEscapeKey(() => setActiveDisputeModal(false), activeDisputeModal);
+  useEscapeKey(() => setActiveResolveModal(false), activeResolveModal);
+  // The overlay stays on the stack while a transaction runs, so Escape cannot close the modal under it.
+  useEscapeKey(() => {
+    if (txState.stage === 'success' || txState.stage === 'error') {
+      setTxState((prev) => ({ ...prev, isOpen: false }));
+    }
+  }, txState.isOpen);
+
   const computeDeliverableHash = async (input: string): Promise<string> => {
     const trimmed = input.trim();
     if (trimmed) {
@@ -957,6 +979,12 @@ export default function ProjectDetailsPage() {
                           >
                             {m.deliverable_url}
                           </a>
+                        </div>
+                      )}
+
+                      {m.deliverable_notes && (
+                        <div className="pl-10 pt-1">
+                          <DeliverableChecksums notes={m.deliverable_notes} />
                         </div>
                       )}
 
